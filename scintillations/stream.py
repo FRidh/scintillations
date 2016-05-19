@@ -21,37 +21,36 @@ scintillations.sequence.variance_gaussian = _variance_gaussian
 
 from scintillations.sequence import * # amplitude_fluctuations, delay_fluctuations, impulse_response_fluctuations, variance_gaussian, correlation_spherical_wave
 
-def _generate_sequence(ntaps, D, D0, state):
+#def _generate_sequence(ntaps, D, D0, state):
 
-    # D = v / L * fs
+    ## D = v / L * fs
 
-    x = np.arange(ntaps) #* D0
-    correlation = _correlation_spherical_wave(x)
+    #x = np.arange(ntaps) #* D0
+    #correlation = _correlation_spherical_wave(x)
 
-    #correlation = correlation_spherical_wave(tau(ntaps, fs_base), fs_base)
-    ir = impulse_response_fluctuations(correlation, ntaps)
-    print(ir.min())
+    ##correlation = correlation_spherical_wave(tau(ntaps, fs_base), fs_base)
+    #ir = impulse_response_fluctuations(correlation, ntaps)
 
-    noise = streaming.signal.noise(state=state)
-    # Fluctuations without taking into account the actual correlation length, speed or sample frequency
-    # Ideal block size? I don't know. Depends on the above parameters!
-    fluctuations = streaming.signal.convolve_overlap_save(noise, streaming.signal.constant(ir), nhop=8192, ntaps=ntaps)
+    #noise = streaming.signal.noise(state=state)
+    ## Fluctuations without taking into account the actual correlation length, speed or sample frequency
+    ## Ideal block size? I don't know. Depends on the above parameters!
+    #fluctuations = streaming.signal.convolve_overlap_save(noise, streaming.signal.constant(ir), nhop=8192, ntaps=ntaps)
 
-    # Sample times for the initial sample frequency
-    times_compressed =  streaming.signal.times(D0)
+    ## Sample times for the initial sample frequency
+    #times_compressed =  streaming.signal.times(D0)
 
-    # Sample times at output sample frequency, taking into account the correlation time
-    times = streaming.Stream(itertools.chain([0.0], streaming.signal.cumsum(D)))
+    ## Sample times at output sample frequency, taking into account the correlation time
+    #times = streaming.Stream(itertools.chain([0.0], streaming.signal.cumsum(D)))
 
-    fluctuations = streaming.signal.interpolate(times_compressed, fluctuations, times)
-    return fluctuations
+    #fluctuations = streaming.signal.interpolate(times_compressed, fluctuations, times)
+    #return fluctuations
 
 
-def generate_fluctuations_resample_fluctuations(ntaps, fs_desired, correlation_time, state, f0):
-    D = 1./(correlation_time * fs_desired)
-    D0 = f0 / f_desired
+#def generate_fluctuations_resample_fluctuations(ntaps, fs_desired, correlation_time, state, f0):
+    #D = 1./(correlation_time * fs_desired)
+    #D0 = f0 / f_desired
 
-    return _generate_sequence(ntaps, D, D0, state)
+    #return _generate_sequence(ntaps, D, D0, state)
 
 
 from scintillations.sequence import _impulse_response_fluctuations
@@ -72,9 +71,9 @@ def generate_fluctuations_resample_fluctuations(ntaps, fs_desired, correlation_t
 
     # We now generate fluctuations without taking into account the actual correlation length, speed or sample frequency.
     # Ideal block size? I don't know. Depends on the above parameters!
-    nblock = ntaps # Arbitrary
-    noise = streaming.signal.noise(nblock=nblock, state=state)
-    fluctuations = streaming.signal.convolve_overlap_save(noise, streaming.signal.constant(ir), nhop=nblock, ntaps=ntaps)
+    nhop = ntaps # Arbitrary
+    noise = streaming.signal.noise(nblock=nhop, state=state)
+    fluctuations = streaming.signal.convolve_overlap_save(noise, streaming.signal.constant(ir), nhop=nhop, ntaps=ntaps)
 
     # Sample times for the initial sample frequency
     times_compressed = streaming.signal.times(1./fs_base)
@@ -208,16 +207,19 @@ def generate_fluctuations_spectra_and_delay(fs, ntaps, correlation_length, speed
     distance = _stream_or_constant(distance)
     mean_mu_squared = _stream_or_constant(mean_mu_squared)
 
-    correlation_time = correlation_length.copy() / speed
+    correlation_time = correlation_length.copy() / speed.copy()
 
     fluctuations = generate_fluctuations_resample_fluctuations(ntaps, fs, correlation_time, state, window=window, fs_base=fmin).samples()
 
-    wavenumber = 2.*np.pi*frequency/soundspeed
-    logamp = logamp_fluctuations(fluctuations.copy(), wavenumber, distance.copy(), correlation_length.copy(), mean_mu_squared.copy(), include_saturation)
-    phase = phase_fluctuations(fluctuations, 2.*np.pi*1.0/soundspeed, distance, correlation_length, mean_mu_squared)
+    wavenumber_logamp = 2.*np.pi*frequency/soundspeed.copy()
+    wavenumber_phase = 2.*np.pi*1.0/soundspeed.copy()
+    logamp = logamp_fluctuations(fluctuations.copy(), wavenumber_logamp, distance.copy(), correlation_length.copy(), mean_mu_squared.copy(), include_saturation)
+    phase  = phase_fluctuations (fluctuations.copy(), wavenumber_phase , distance.copy(), correlation_length.copy(), mean_mu_squared.copy())
 
     spectra = amplitude_fluctuations(logamp)
     delay = delay_fluctuations(phase, fs, 1.0)
+
+    del fluctuations, distance, correlation_length, mean_mu_squared, speed, soundspeed
 
     return spectra, delay
 
