@@ -7,6 +7,18 @@ Generate a stream of scintillations. Functions in this module are supposed to wo
 """
 import streaming
 import itertools
+
+# Monkey patch with function for streams
+import scintillations
+
+def _variance_gaussian(distance, wavenumber, scale, mean_mu_squared, include_saturation=False):
+    variance = np.sqrt(np.pi)/2.0 * mean_mu_squared.copy() * wavenumber.copy()*2.0 * distance.copy() * scale.copy()
+    if include_saturation:
+        variance *= saturation_factor(distance, wavenumber, scale, mean_mu_squared)
+    return variance
+
+scintillations.sequence.variance_gaussian = _variance_gaussian
+
 from scintillations.sequence import * # amplitude_fluctuations, delay_fluctuations, impulse_response_fluctuations, variance_gaussian, correlation_spherical_wave
 
 def _generate_sequence(ntaps, D, D0, state):
