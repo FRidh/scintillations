@@ -73,7 +73,7 @@ def generate_fluctuations_resample_fluctuations(ntaps, fs_desired, correlation_t
     # Ideal block size? I don't know. Depends on the above parameters!
     nhop = ntaps # Arbitrary
     noise = streaming.signal.noise(nblock=nhop, state=state)
-    fluctuations = streaming.signal.convolve_overlap_save(noise, streaming.signal.constant(ir), nhop=nhop, ntaps=ntaps)
+    fluctuations = streaming.signal.convolve_overlap_add(noise, streaming.signal.constant(ir), nhop=nhop, ntaps=ntaps)
 
     # Sample times for the initial sample frequency
     times_compressed = streaming.signal.times(1./fs_base)
