@@ -12,7 +12,7 @@ import itertools
 import scintillations
 
 def _variance_gaussian(distance, wavenumber, scale, mean_mu_squared, include_saturation=False):
-    variance = np.sqrt(np.pi)/2.0 * mean_mu_squared.copy() * wavenumber.copy()*2.0 * distance.copy() * scale.copy()
+    variance = np.sqrt(np.pi)/2.0 * mean_mu_squared.copy() * wavenumber.copy()**2.0 * distance.copy() * scale.copy()
     if include_saturation:
         variance *= saturation_factor(distance, wavenumber, scale, mean_mu_squared)
     return variance
