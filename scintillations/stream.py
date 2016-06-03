@@ -7,19 +7,37 @@ Generate a stream of scintillations. Functions in this module are supposed to wo
 """
 import streaming
 import itertools
+from scintillations.common import * # amplitude_fluctuations, delay_fluctuations, impulse_response_fluctuations, variance_gaussian, correlation_spherical_wave
+from scintillations.common import _fluctuations_with_variance
 
-# Monkey patch with function for streams
-import scintillations
 
-def _variance_gaussian(distance, wavenumber, scale, mean_mu_squared, include_saturation=False):
+def variance_gaussian(distance, wavenumber, scale, mean_mu_squared, include_saturation=False):
+    """Variance of Gaussian fluctuations.
+
+    :param distance: Distance.
+    :param wavenumber: Wavenumber.
+    :param scale: Correlation length
+    :param mean_mu_squared: Mean mu squared.
+
+    :param include_saturation: Whether to include log-amplitude saturation. In this case the variance is multiplied with the saturation factor, :func:`saturation_factor`.
+    :returns: Variance
+
+    .. math:: \\langle \\chi^2 \\rangle = \\langle S^2 \\rangle = \\frac{\\sqrt{\\pi}}{2} \\langle \\mu^2 \\rangle k^2 r L
+
+    """
     variance = np.sqrt(np.pi)/2.0 * mean_mu_squared.copy() * wavenumber.copy()**2.0 * distance.copy() * scale.copy()
     if include_saturation:
         variance *= saturation_factor(distance, wavenumber, scale, mean_mu_squared)
     return variance
 
-scintillations.sequence.variance_gaussian = _variance_gaussian
 
-from scintillations.sequence import * # amplitude_fluctuations, delay_fluctuations, impulse_response_fluctuations, variance_gaussian, correlation_spherical_wave
+def fluctuations_with_variance(fluctuations, wavenumber, distance, correlation_length, mean_mu_squared, include_saturation=False):
+    """Generate fluctuations with correct variance.
+    """
+    return _fluctuations_with_variance(variance_gaussian, fluctuations, wavenumber, distance, correlation_length, mean_mu_squared, include_saturation)
+
+
+#from common import *
 
 #def _generate_sequence(ntaps, D, D0, state):
 
@@ -53,7 +71,7 @@ from scintillations.sequence import * # amplitude_fluctuations, delay_fluctuatio
     #return _generate_sequence(ntaps, D, D0, state)
 
 
-from scintillations.sequence import _impulse_response_fluctuations
+
 
 def generate_fluctuations_resample_fluctuations(ntaps, fs_desired, correlation_time, state, fs_base=50., window=None):
     """Generate fluctuations.
@@ -67,7 +85,7 @@ def generate_fluctuations_resample_fluctuations(ntaps, fs_desired, correlation_t
 
     """
     correlation = correlation_spherical_wave(tau(ntaps, fs_base), fs_base)
-    ir = _impulse_response_fluctuations(correlation, ntaps)
+    ir = impulse_response_fluctuations(correlation, ntaps)
 
     # We now generate fluctuations without taking into account the actual correlation length, speed or sample frequency.
     # Ideal block size? I don't know. Depends on the above parameters!
@@ -213,8 +231,8 @@ def generate_fluctuations_spectra_and_delay(fs, ntaps, correlation_length, speed
 
     wavenumber_logamp = 2.*np.pi*frequency/soundspeed.copy()
     wavenumber_phase = 2.*np.pi*1.0/soundspeed.copy()
-    logamp = logamp_fluctuations(fluctuations.copy(), wavenumber_logamp, distance.copy(), correlation_length.copy(), mean_mu_squared.copy(), include_saturation)
-    phase  = phase_fluctuations (fluctuations.copy(), wavenumber_phase , distance.copy(), correlation_length.copy(), mean_mu_squared.copy())
+    logamp = fluctuations_with_variance(fluctuations.copy(), wavenumber_logamp, distance.copy(), correlation_length.copy(), mean_mu_squared.copy(), include_saturation)
+    phase  = fluctuations_with_variance(fluctuations.copy(), wavenumber_phase , distance.copy(), correlation_length.copy(), mean_mu_squared.copy(), False)
 
     spectra = amplitude_fluctuations(logamp)
     delay = delay_fluctuations(phase, fs, 1.0)
@@ -240,8 +258,8 @@ def generate_fluctuations_complex_spectrum(fluctuations):
     fluctuations = generate_fluctuations_resample_fluctuations(ntaps, fs, correlation_time, state, window=window, fs_base=fmin).samples()
 
     wavenumber = 2.*np.pi*frequency/soundspeed
-    logamp = logamp_fluctuations(fluctuations.copy(), wavenumber.copy(), distance.copy(), correlation_length.copy(), mean_mu_squared.copy(), include_saturation)
-    phase = phase_fluctuations(fluctuations, wavenumber, distance, correlation_length, mean_mu_squared)
+    logamp = fluctuations_with_variance(fluctuations.copy(), wavenumber.copy(), distance.copy(), correlation_length.copy(), mean_mu_squared.copy(), include_saturation)
+    phase =  fluctuations_with_variance(fluctuations, wavenumber, distance, correlation_length, mean_mu_squared, False)
 
     complex_spectra = complex_fluctuations(logamp, phase)
     return complex_spectra

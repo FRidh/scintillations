@@ -7,5 +7,6 @@ Atmospheric turbulence causes fluctuations in the sound speed which in effects c
 This module contains functions for generating and analyzing sequences of scintillations that follow a Gaussian spectrum,
 """
 
+import scintillations.common
 import scintillations.sequence
 import scintillations.stream
