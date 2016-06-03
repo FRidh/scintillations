@@ -90,7 +90,7 @@ def tau(ntaps, fs):
     :param fs: Sample frequency.
 
     """
-    return np.fft.fftfreq(ntaps, fs/ntaps)
+    return np.fft.rfftfreq(ntaps, fs/ntaps)
 
 
 def correlation_spherical_wave(spatial_separation, correlation_length):
