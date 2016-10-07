@@ -1,0 +1,492 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>scintillations.stream &#8212; scintillations 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="scintillations 0.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">scintillations 0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for scintillations.stream</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Stream</span>
+<span class="sd">======</span>
+
+<span class="sd">Generate a stream of scintillations. Functions in this module are supposed to work with :mod:`streaming.stream`.</span>
+
+<span class="sd">Varying correlation time is taken into account by resampling the generated fluctuations.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">streaming</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">from</span> <span class="nn">scintillations.common</span> <span class="k">import</span> <span class="o">*</span> <span class="c1"># amplitude_fluctuations, delay_fluctuations, impulse_response_fluctuations, variance_gaussian, correlation_spherical_wave</span>
+<span class="kn">from</span> <span class="nn">scintillations.common</span> <span class="k">import</span> <span class="n">_fluctuations_with_variance</span>
+
+
+<div class="viewcode-block" id="variance_gaussian"><a class="viewcode-back" href="../../stream.html#scintillations.stream.variance_gaussian">[docs]</a><span class="k">def</span> <span class="nf">variance_gaussian</span><span class="p">(</span><span class="n">distance</span><span class="p">,</span> <span class="n">wavenumber</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">mean_mu_squared</span><span class="p">,</span> <span class="n">include_saturation</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Variance of Gaussian fluctuations.</span>
+
+<span class="sd">    :param distance: Distance.</span>
+<span class="sd">    :param wavenumber: Wavenumber.</span>
+<span class="sd">    :param scale: Correlation length</span>
+<span class="sd">    :param mean_mu_squared: Mean mu squared.</span>
+
+<span class="sd">    :param include_saturation: Whether to include log-amplitude saturation. In this case the variance is multiplied with the saturation factor, :func:`saturation_factor`.</span>
+<span class="sd">    :returns: Variance</span>
+
+<span class="sd">    .. math:: \\langle \\chi^2 \\rangle = \\langle S^2 \\rangle = \\frac{\\sqrt{\\pi}}{2} \\langle \\mu^2 \\rangle k^2 r L</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">variance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span><span class="o">/</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">mean_mu_squared</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="o">*</span> <span class="n">wavenumber</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span><span class="o">**</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">distance</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="o">*</span> <span class="n">scale</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">include_saturation</span><span class="p">:</span>
+        <span class="n">variance</span> <span class="o">*=</span> <span class="n">saturation_factor</span><span class="p">(</span><span class="n">distance</span><span class="p">,</span> <span class="n">wavenumber</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">mean_mu_squared</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">variance</span></div>
+
+
+<div class="viewcode-block" id="fluctuations_with_variance"><a class="viewcode-back" href="../../stream.html#scintillations.stream.fluctuations_with_variance">[docs]</a><span class="k">def</span> <span class="nf">fluctuations_with_variance</span><span class="p">(</span><span class="n">fluctuations</span><span class="p">,</span> <span class="n">wavenumber</span><span class="p">,</span> <span class="n">distance</span><span class="p">,</span> <span class="n">correlation_length</span><span class="p">,</span> <span class="n">mean_mu_squared</span><span class="p">,</span> <span class="n">include_saturation</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generate fluctuations with correct variance.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">_fluctuations_with_variance</span><span class="p">(</span><span class="n">variance_gaussian</span><span class="p">,</span> <span class="n">fluctuations</span><span class="p">,</span> <span class="n">wavenumber</span><span class="p">,</span> <span class="n">distance</span><span class="p">,</span> <span class="n">correlation_length</span><span class="p">,</span> <span class="n">mean_mu_squared</span><span class="p">,</span> <span class="n">include_saturation</span><span class="p">)</span></div>
+
+
+<span class="c1">#from common import *</span>
+
+<span class="c1">#def _generate_sequence(ntaps, D, D0, state):</span>
+
+    <span class="c1">## D = v / L * fs</span>
+
+    <span class="c1">#x = np.arange(ntaps) #* D0</span>
+    <span class="c1">#correlation = _correlation_spherical_wave(x)</span>
+
+    <span class="c1">##correlation = correlation_spherical_wave(tau(ntaps, fs_base), fs_base)</span>
+    <span class="c1">#ir = impulse_response_fluctuations(correlation, ntaps)</span>
+
+    <span class="c1">#noise = streaming.signal.noise(state=state)</span>
+    <span class="c1">## Fluctuations without taking into account the actual correlation length, speed or sample frequency</span>
+    <span class="c1">## Ideal block size? I don&#39;t know. Depends on the above parameters!</span>
+    <span class="c1">#fluctuations = streaming.signal.convolve_overlap_save(noise, streaming.signal.constant(ir), nhop=8192, ntaps=ntaps)</span>
+
+    <span class="c1">## Sample times for the initial sample frequency</span>
+    <span class="c1">#times_compressed =  streaming.signal.times(D0)</span>
+
+    <span class="c1">## Sample times at output sample frequency, taking into account the correlation time</span>
+    <span class="c1">#times = streaming.Stream(itertools.chain([0.0], streaming.signal.cumsum(D)))</span>
+
+    <span class="c1">#fluctuations = streaming.signal.interpolate(times_compressed, fluctuations, times)</span>
+    <span class="c1">#return fluctuations</span>
+
+
+<span class="c1">#def generate_fluctuations_resample_fluctuations(ntaps, fs_desired, correlation_time, state, f0):</span>
+    <span class="c1">#D = 1./(correlation_time * fs_desired)</span>
+    <span class="c1">#D0 = f0 / f_desired</span>
+
+    <span class="c1">#return _generate_sequence(ntaps, D, D0, state)</span>
+
+
+
+
+<div class="viewcode-block" id="generate_fluctuations_resample_fluctuations"><a class="viewcode-back" href="../../stream.html#scintillations.stream.generate_fluctuations_resample_fluctuations">[docs]</a><span class="k">def</span> <span class="nf">generate_fluctuations_resample_fluctuations</span><span class="p">(</span><span class="n">ntaps</span><span class="p">,</span> <span class="n">fs_desired</span><span class="p">,</span> <span class="n">correlation_time</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">fs_base</span><span class="o">=</span><span class="mf">50.</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generate fluctuations.</span>
+
+<span class="sd">    :param fs_desired: Sample frequency of the input and the output.</span>
+<span class="sd">    :param fs: Sample frequency at which to compute the initial fluctuations.</span>
+
+<span class="sd">    :returns: Fluctuations.</span>
+
+<span class="sd">    .. note:: This function applies change of relative speed by resampling the fluctuations at a different pace.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">correlation</span> <span class="o">=</span> <span class="n">correlation_spherical_wave</span><span class="p">(</span><span class="n">tau</span><span class="p">(</span><span class="n">ntaps</span><span class="p">,</span> <span class="n">fs_base</span><span class="p">),</span> <span class="n">fs_base</span><span class="p">)</span>
+    <span class="n">ir</span> <span class="o">=</span> <span class="n">impulse_response_fluctuations</span><span class="p">(</span><span class="n">correlation</span><span class="p">,</span> <span class="n">ntaps</span><span class="p">)</span>
+
+    <span class="c1"># We now generate fluctuations without taking into account the actual correlation length, speed or sample frequency.</span>
+    <span class="c1"># Ideal block size? I don&#39;t know. Depends on the above parameters!</span>
+    <span class="n">nhop</span> <span class="o">=</span> <span class="n">ntaps</span> <span class="c1"># Arbitrary</span>
+    <span class="n">noise</span> <span class="o">=</span> <span class="n">streaming</span><span class="o">.</span><span class="n">signal</span><span class="o">.</span><span class="n">noise</span><span class="p">(</span><span class="n">nblock</span><span class="o">=</span><span class="n">nhop</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="n">state</span><span class="p">)</span>
+    <span class="n">fluctuations</span> <span class="o">=</span> <span class="n">streaming</span><span class="o">.</span><span class="n">signal</span><span class="o">.</span><span class="n">convolve_overlap_add</span><span class="p">(</span><span class="n">noise</span><span class="p">,</span> <span class="n">streaming</span><span class="o">.</span><span class="n">signal</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">ir</span><span class="p">),</span> <span class="n">nhop</span><span class="o">=</span><span class="n">nhop</span><span class="p">,</span> <span class="n">ntaps</span><span class="o">=</span><span class="n">ntaps</span><span class="p">)</span>
+
+    <span class="c1"># Sample times for the initial sample frequency</span>
+    <span class="n">times_compressed</span> <span class="o">=</span> <span class="n">streaming</span><span class="o">.</span><span class="n">signal</span><span class="o">.</span><span class="n">times</span><span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="n">fs_base</span><span class="p">)</span>
+
+    <span class="c1"># Sample times at output sample frequency, taking into account the correlation time</span>
+    <span class="n">times</span> <span class="o">=</span> <span class="n">streaming</span><span class="o">.</span><span class="n">Stream</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="p">([</span><span class="mf">0.0</span><span class="p">],</span> <span class="n">streaming</span><span class="o">.</span><span class="n">signal</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="n">correlation_time</span> <span class="o">/</span> <span class="n">fs_desired</span><span class="p">)))</span>
+
+    <span class="c1"># Resample fluctuations to take into account the actual parameters</span>
+    <span class="n">fluctuations</span> <span class="o">=</span> <span class="n">streaming</span><span class="o">.</span><span class="n">signal</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">times_compressed</span><span class="p">,</span> <span class="n">fluctuations</span><span class="p">,</span> <span class="n">times</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">fluctuations</span></div>
+
+
+<div class="viewcode-block" id="generate_fluctuations_resample_filter"><a class="viewcode-back" href="../../stream.html#scintillations.stream.generate_fluctuations_resample_filter">[docs]</a><span class="k">def</span> <span class="nf">generate_fluctuations_resample_filter</span><span class="p">(</span><span class="n">fs_desired</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">ntaps</span><span class="p">,</span> <span class="n">speed</span><span class="p">,</span> <span class="n">correlation_length</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generate fluctuations.</span>
+
+<span class="sd">    .. note:: This function applies change of relative speed by updating the impulse response of the filter by resampling the initial frequency response.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="bp">NotImplemented</span></div>
+
+
+<div class="viewcode-block" id="generate_fluctuations_update_filter"><a class="viewcode-back" href="../../stream.html#scintillations.stream.generate_fluctuations_update_filter">[docs]</a><span class="k">def</span> <span class="nf">generate_fluctuations_update_filter</span><span class="p">(</span><span class="n">ntaps</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">correlation_time</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generate fluctuations.</span>
+
+<span class="sd">    .. note:: This function applies change of relative speed by updating the impulse response of the filter by recomputing.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">nblock</span> <span class="o">=</span> <span class="n">ntaps</span>
+    <span class="n">_tau</span> <span class="o">=</span> <span class="n">tau</span><span class="p">(</span><span class="n">ntaps</span><span class="p">,</span> <span class="n">fs</span><span class="p">)</span>
+    <span class="n">correlation</span> <span class="o">=</span> <span class="n">correlation_time</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">correlation_spherical_wave</span><span class="p">(</span><span class="n">_tau</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span>
+
+    <span class="n">ir</span> <span class="o">=</span> <span class="n">correlation</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">c</span><span class="p">:</span> <span class="n">impulse_response_fluctuations</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">ntaps</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">))</span>
+    <span class="c1">#ir = streaming.Stream(impulse_response_fluctuations(c, ntaps, window=window) for c in correlation)</span>
+
+    <span class="c1"># Noise generator. Samples from the standard normal distribution.</span>
+    <span class="n">state</span> <span class="o">=</span> <span class="n">state</span> <span class="k">if</span> <span class="n">state</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">()</span>
+    <span class="n">noise</span> <span class="o">=</span> <span class="n">streaming</span><span class="o">.</span><span class="n">signal</span><span class="o">.</span><span class="n">noise</span><span class="p">(</span><span class="n">nblock</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="n">state</span><span class="p">)</span><span class="o">.</span><span class="n">blocks</span><span class="p">(</span><span class="n">nblock</span><span class="o">=</span><span class="n">ntaps</span><span class="p">,</span> <span class="n">noverlap</span><span class="o">=</span><span class="n">ntaps</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="c1">#noise = streaming.BlockStream( (state.randn(nblock) for i in itertools.count()), nblock)</span>
+    <span class="c1">#fluctuations = streaming.Stream(fftconvolve(block, i, mode=&#39;valid&#39;)[0] for block, i in zip(noise, ir))</span>
+    <span class="n">fluctuations</span> <span class="o">=</span> <span class="n">streaming</span><span class="o">.</span><span class="n">signal</span><span class="o">.</span><span class="n">convolve_overlap_save</span><span class="p">(</span><span class="n">noise</span><span class="p">,</span> <span class="n">ir</span><span class="p">,</span> <span class="n">nblock</span><span class="p">,</span> <span class="n">ntaps</span><span class="p">)</span><span class="o">.</span><span class="n">samples</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">fluctuations</span></div>
+
+
+<div class="viewcode-block" id="generate_fluctuations"><a class="viewcode-back" href="../../stream.html#scintillations.stream.generate_fluctuations">[docs]</a><span class="k">def</span> <span class="nf">generate_fluctuations</span><span class="p">(</span><span class="n">fs_desired</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">ntaps</span><span class="p">,</span> <span class="n">speed</span><span class="p">,</span> <span class="n">correlation_length</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;resample_fluctuations&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generate fluctuations.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;resample_fluctuations&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">generate_fluctuations_resample_fluctuations</span><span class="p">(</span><span class="n">fs_desired</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">ntaps</span><span class="p">,</span> <span class="n">speed</span><span class="p">,</span> <span class="n">correlation_length</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;update_filter&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">generate_fluctuations_update_filter</span><span class="p">(</span><span class="n">fs_desired</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">ntaps</span><span class="p">,</span> <span class="n">speed</span><span class="p">,</span> <span class="n">correlation_length</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;resample_filter&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">generate_fluctuations_resample_filter</span><span class="p">(</span><span class="n">fs_desired</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">ntaps</span><span class="p">,</span> <span class="n">speed</span><span class="p">,</span> <span class="n">correlation_length</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></div>
+
+
+
+<span class="c1">#def fluctuations_naf(nblock, fs, nbins, ntaps, speed, correlation_length,</span>
+                     <span class="c1">#distance, soundspeed, mean_mu_squared, window, seed, include_saturation):</span>
+    <span class="c1">#&quot;&quot;&quot;Generate gains and delays for amplitude and phase modulations.</span>
+
+    <span class="c1">#:param nblock: Blocksize the NAF uses.</span>
+    <span class="c1">#:param fs: Sample frequency the NAF uses.</span>
+    <span class="c1">#:param nbins: Amount of frequency bins for the amplitude modulations&#39; spectra.</span>
+    <span class="c1">#:param ntaps: Amount of points to sample the correlation function.</span>
+
+    <span class="c1">#.. note:: Single values per block.</span>
+    <span class="c1">#&quot;&quot;&quot;</span>
+    <span class="c1">## Blocks per second in the NAF</span>
+    <span class="c1">#fs_desired = fs / nblock</span>
+    <span class="c1">## Samples per second at which to compute fluctuations</span>
+    <span class="c1">#fs_low = 1000.</span>
+
+    <span class="c1">## Warn when sample frequency is too low.</span>
+
+    <span class="c1">##------Fluctuations with variance 1---------</span>
+    <span class="c1">## Ideally we use the function that works at lower sample frequency. However, then it gets difficult because the</span>
+    <span class="c1">## amount of taps is going to be higher than the blocksize (1).</span>
+    <span class="c1">##fluctuations = _generate_gaussian_fluctuations(nblock, ntaps, fs, correlation_time, window=window, state=state)</span>
+    <span class="c1">## Instead we now consider the upsampled version, partition in blocks with the blocksize the NAF uses,</span>
+    <span class="c1">###fluctuations = turbulence_fluctuations(ntaps, fs, fs_low, ntaps, speed,</span>
+    <span class="c1">###                                       correlation_length, window=window, state=np.random.RandomState(seed))</span>
+    <span class="c1">## and then just pick the last item of the fluctuations.</span>
+    <span class="c1">###fluctuations = streaming.Stream(fluctuations.blocks(nblock).map(lambda x: x[-1]))</span>
+    <span class="c1">#state = np.random.RandomState(seed)</span>
+    <span class="c1">#fluctuations = generate_fluctuations_resampling(fs_desired, fs_low, ntaps, speed, correlation_length, state, window=window)</span>
+
+    <span class="c1">#logamp, phase = fluctuations.tee()</span>
+
+    <span class="c1">##------Amplitude fluctuations--------------</span>
+    <span class="c1">#frequencies = np.fft.rfftfreq(nbins, 1./fs)</span>
+    <span class="c1">#wavenumbers = 2.*np.pi*frequencies / soundspeed</span>
+    <span class="c1">#logamp_func = lambda d : variance_gaussian(d, wavenumbers, correlation_length, mean_mu_squared, include_saturation=include_saturation)</span>
+    <span class="c1">## Variances as function of time</span>
+    <span class="c1">##variance_logamp = distance.map(logamp_func)</span>
+    <span class="c1">#variance_logamp = logamp_func(distance)</span>
+    <span class="c1">##print(variance_logamp.peek())</span>
+    <span class="c1">##print(logamp.peek())</span>
+
+    <span class="c1">## Spectral gains as function of time</span>
+    <span class="c1">#spectrum = np.exp( logamp * variance_logamp.sqrt() )</span>
+
+    <span class="c1">##------Phase or delay fluctuations---------</span>
+    <span class="c1">#omega = 2.0*np.pi*1.0</span>
+    <span class="c1">#wavenumber = omega / soundspeed</span>
+    <span class="c1">#phase_func = lambda d : variance_gaussian(d, wavenumber, correlation_length, mean_mu_squared)</span>
+    <span class="c1">#variance_phase = distance.copy().map(phase_func)</span>
+    <span class="c1">#phase = phase * variance_phase.sqrt()</span>
+    <span class="c1">#delay = phase / omega</span>
+
+    <span class="c1">#return frequencies, spectrum, delay</span>
+
+
+<span class="k">def</span> <span class="nf">_stream_or_constant</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">streaming</span><span class="o">.</span><span class="n">abstractstream</span><span class="o">.</span><span class="n">AbstractStream</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">samples</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">streaming</span><span class="o">.</span><span class="n">signal</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="generate_fluctuations_spectra_and_delay"><a class="viewcode-back" href="../../stream.html#scintillations.stream.generate_fluctuations_spectra_and_delay">[docs]</a><span class="k">def</span> <span class="nf">generate_fluctuations_spectra_and_delay</span><span class="p">(</span><span class="n">fs</span><span class="p">,</span> <span class="n">ntaps</span><span class="p">,</span> <span class="n">correlation_length</span><span class="p">,</span> <span class="n">speed</span><span class="p">,</span> <span class="n">frequency</span><span class="p">,</span> <span class="n">soundspeed</span><span class="p">,</span>
+                                            <span class="n">distance</span><span class="p">,</span> <span class="n">mean_mu_squared</span><span class="p">,</span> <span class="n">fmin</span><span class="p">,</span> <span class="n">include_saturation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generate fluctuations.</span>
+
+<span class="sd">    :param fs: Sample frequency.</span>
+<span class="sd">    :param ntaps: Taps of impulse response.</span>
+<span class="sd">    :param correlation_length: Correlation length.</span>
+
+<span class="sd">    :returns: Frequencies, magnitude spectra and delays.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">correlation_length</span> <span class="o">=</span> <span class="n">_stream_or_constant</span><span class="p">(</span><span class="n">correlation_length</span><span class="p">)</span>
+    <span class="n">speed</span> <span class="o">=</span> <span class="n">_stream_or_constant</span><span class="p">(</span><span class="n">speed</span><span class="p">)</span>
+    <span class="n">soundspeed</span> <span class="o">=</span> <span class="n">_stream_or_constant</span><span class="p">(</span><span class="n">soundspeed</span><span class="p">)</span>
+    <span class="n">distance</span> <span class="o">=</span> <span class="n">_stream_or_constant</span><span class="p">(</span><span class="n">distance</span><span class="p">)</span>
+    <span class="n">mean_mu_squared</span> <span class="o">=</span> <span class="n">_stream_or_constant</span><span class="p">(</span><span class="n">mean_mu_squared</span><span class="p">)</span>
+
+    <span class="n">correlation_time</span> <span class="o">=</span> <span class="n">correlation_length</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="o">/</span> <span class="n">speed</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="n">fluctuations</span> <span class="o">=</span> <span class="n">generate_fluctuations_resample_fluctuations</span><span class="p">(</span><span class="n">ntaps</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">correlation_time</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">,</span> <span class="n">fs_base</span><span class="o">=</span><span class="n">fmin</span><span class="p">)</span><span class="o">.</span><span class="n">samples</span><span class="p">()</span>
+
+    <span class="n">wavenumber_logamp</span> <span class="o">=</span> <span class="mf">2.</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">frequency</span><span class="o">/</span><span class="n">soundspeed</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">wavenumber_phase</span> <span class="o">=</span> <span class="mf">2.</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="mf">1.0</span><span class="o">/</span><span class="n">soundspeed</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">logamp</span> <span class="o">=</span> <span class="n">fluctuations_with_variance</span><span class="p">(</span><span class="n">fluctuations</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">wavenumber_logamp</span><span class="p">,</span> <span class="n">distance</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">correlation_length</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">mean_mu_squared</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">include_saturation</span><span class="p">)</span>
+    <span class="n">phase</span>  <span class="o">=</span> <span class="n">fluctuations_with_variance</span><span class="p">(</span><span class="n">fluctuations</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">wavenumber_phase</span> <span class="p">,</span> <span class="n">distance</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">correlation_length</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">mean_mu_squared</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">spectra</span> <span class="o">=</span> <span class="n">amplitude_fluctuations</span><span class="p">(</span><span class="n">logamp</span><span class="p">)</span>
+    <span class="n">delay</span> <span class="o">=</span> <span class="n">delay_fluctuations</span><span class="p">(</span><span class="n">phase</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+
+    <span class="k">del</span> <span class="n">fluctuations</span><span class="p">,</span> <span class="n">distance</span><span class="p">,</span> <span class="n">correlation_length</span><span class="p">,</span> <span class="n">mean_mu_squared</span><span class="p">,</span> <span class="n">speed</span><span class="p">,</span> <span class="n">soundspeed</span>
+
+    <span class="k">return</span> <span class="n">spectra</span><span class="p">,</span> <span class="n">delay</span></div>
+
+
+<div class="viewcode-block" id="generate_fluctuations_complex_spectrum"><a class="viewcode-back" href="../../stream.html#scintillations.stream.generate_fluctuations_complex_spectrum">[docs]</a><span class="k">def</span> <span class="nf">generate_fluctuations_complex_spectrum</span><span class="p">(</span><span class="n">fluctuations</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generate fluctuations.</span>
+
+<span class="sd">    :returns: Frequencies, complex spectra</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">correlation_length</span> <span class="o">=</span> <span class="n">_stream_or_constant</span><span class="p">(</span><span class="n">correlation_length</span><span class="p">)</span>
+    <span class="n">speed</span> <span class="o">=</span> <span class="n">_stream_or_constant</span><span class="p">(</span><span class="n">speed</span><span class="p">)</span>
+    <span class="n">soundspeed</span> <span class="o">=</span> <span class="n">_stream_or_constant</span><span class="p">(</span><span class="n">soundspeed</span><span class="p">)</span>
+    <span class="n">distance</span> <span class="o">=</span> <span class="n">_stream_or_constant</span><span class="p">(</span><span class="n">distance</span><span class="p">)</span>
+    <span class="n">mean_mu_squared</span> <span class="o">=</span> <span class="n">_stream_or_constant</span><span class="p">(</span><span class="n">mean_mu_squared</span><span class="p">)</span>
+
+    <span class="n">correlation_time</span> <span class="o">=</span> <span class="n">correlation_length</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="o">/</span> <span class="n">speed</span>
+
+    <span class="n">fluctuations</span> <span class="o">=</span> <span class="n">generate_fluctuations_resample_fluctuations</span><span class="p">(</span><span class="n">ntaps</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">correlation_time</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">,</span> <span class="n">fs_base</span><span class="o">=</span><span class="n">fmin</span><span class="p">)</span><span class="o">.</span><span class="n">samples</span><span class="p">()</span>
+
+    <span class="n">wavenumber</span> <span class="o">=</span> <span class="mf">2.</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">frequency</span><span class="o">/</span><span class="n">soundspeed</span>
+    <span class="n">logamp</span> <span class="o">=</span> <span class="n">fluctuations_with_variance</span><span class="p">(</span><span class="n">fluctuations</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">wavenumber</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">distance</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">correlation_length</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">mean_mu_squared</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">include_saturation</span><span class="p">)</span>
+    <span class="n">phase</span> <span class="o">=</span>  <span class="n">fluctuations_with_variance</span><span class="p">(</span><span class="n">fluctuations</span><span class="p">,</span> <span class="n">wavenumber</span><span class="p">,</span> <span class="n">distance</span><span class="p">,</span> <span class="n">correlation_length</span><span class="p">,</span> <span class="n">mean_mu_squared</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">complex_spectra</span> <span class="o">=</span> <span class="n">complex_fluctuations</span><span class="p">(</span><span class="n">logamp</span><span class="p">,</span> <span class="n">phase</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">complex_spectra</span></div>
+
+
+<div class="viewcode-block" id="modulate_with_spectra_and_delay"><a class="viewcode-back" href="../../stream.html#scintillations.stream.modulate_with_spectra_and_delay">[docs]</a><span class="k">def</span> <span class="nf">modulate_with_spectra_and_delay</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">nhop</span><span class="p">,</span> <span class="n">spectra</span><span class="p">,</span> <span class="n">delay</span><span class="p">,</span> <span class="n">ntaps</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Modulate signal with amplitude and phase fluctuations.</span>
+
+<span class="sd">    :param signal: Carrier signal.</span>
+<span class="sd">    :param fs: Sample frequency of signal.</span>
+<span class="sd">    :param nhop: Compute impulse response to describe fluctuations every `nhop` samples.</span>
+<span class="sd">    :param spectra: Spectrum for each block. Single side magnitude only.</span>
+<span class="sd">    :param delay: Delay for each block.</span>
+<span class="sd">    :param ntaps: Amount of filter taps to use for IR of `spectra`.</span>
+<span class="sd">    :returns: Modulated signal.</span>
+<span class="sd">    :rtype: :class:`streaming.stream.Stream()`</span>
+
+<span class="sd">    .. note:: The spectra describe amplitude fluctuations and the delay is the phase or propagation delay fluctuations.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#signal = signal.blocks(nhop)</span>
+
+    <span class="c1"># Amplitude modulations</span>
+    <span class="k">if</span> <span class="n">spectra</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">ntaps</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;ntaps should be specified when including amplitude modulations.&quot;</span><span class="p">)</span>
+        <span class="c1"># Calculate an IR for each amplitude modulations spectra</span>
+        <span class="c1"># We apply linear-phase</span>
+        <span class="n">compute_ir</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifftshift</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">irfft</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">ntaps</span><span class="p">))</span>
+        <span class="n">ir</span> <span class="o">=</span> <span class="n">spectra</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">compute_ir</span><span class="p">)</span>
+        <span class="c1">#ir = streaming.Stream((np.fft.ifftshift(np.fft.irfft(2.*x, n=ntaps)) for x in spectra))</span>
+
+        <span class="c1"># Apply amplitude modulations</span>
+        <span class="n">signal</span> <span class="o">=</span> <span class="n">streaming</span><span class="o">.</span><span class="n">signal</span><span class="o">.</span><span class="n">convolve_overlap_save</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">ir</span><span class="p">,</span> <span class="n">nhop</span><span class="p">,</span> <span class="n">ntaps</span><span class="p">)</span>
+        <span class="c1"># Linear-phase filter. Correct for group delay.</span>
+        <span class="n">signal</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">samples</span><span class="p">()</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">ntaps</span><span class="o">//</span><span class="mi">2</span><span class="p">))</span>
+
+    <span class="c1"># Time-delay modulations</span>
+    <span class="k">if</span> <span class="n">delay</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Interpolate time-delay modulations</span>
+        <span class="n">times</span> <span class="o">=</span> <span class="n">streaming</span><span class="o">.</span><span class="n">signal</span><span class="o">.</span><span class="n">times</span><span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="n">fs</span><span class="p">)</span>
+        <span class="n">fb</span> <span class="o">=</span> <span class="n">fs</span> <span class="o">/</span> <span class="n">nhop</span>
+        <span class="n">times_low</span> <span class="o">=</span> <span class="n">streaming</span><span class="o">.</span><span class="n">signal</span><span class="o">.</span><span class="n">times</span><span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="n">fb</span><span class="p">)</span>
+        <span class="n">delay</span> <span class="o">=</span> <span class="n">streaming</span><span class="o">.</span><span class="n">signal</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">times_low</span><span class="p">,</span> <span class="n">delay</span><span class="p">,</span> <span class="n">times</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+        <span class="c1"># Apply time-delay modulations</span>
+        <span class="n">signal</span> <span class="o">=</span> <span class="n">streaming</span><span class="o">.</span><span class="n">signal</span><span class="o">.</span><span class="n">vdl</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">times</span><span class="p">,</span> <span class="n">delay</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">signal</span></div>
+
+
+<div class="viewcode-block" id="modulate_with_complex_spectra"><a class="viewcode-back" href="../../stream.html#scintillations.stream.modulate_with_complex_spectra">[docs]</a><span class="k">def</span> <span class="nf">modulate_with_complex_spectra</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">nhop</span><span class="p">,</span> <span class="n">complex_spectra</span><span class="p">,</span> <span class="n">ntaps</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Modulate signal with amplitude and phase fluctuations.</span>
+
+<span class="sd">    .. note:: The complex spectra includes amplitude and phase fluctuations.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ir</span> <span class="o">=</span> <span class="n">spectrum</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifftshift</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">irfft</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="n">ntaps</span><span class="p">)))</span>
+    <span class="c1"># Convolve signal with complex spectra.</span>
+    <span class="c1"># Because we add a linear-phase (ifftshift) we correct for that by dropping samples.</span>
+    <span class="n">signal</span> <span class="o">=</span> <span class="n">streaming</span><span class="o">.</span><span class="n">signal</span><span class="o">.</span><span class="n">convolve_overlap_save</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">ir</span><span class="p">,</span> <span class="n">nhop</span><span class="p">,</span> <span class="n">ntaps</span><span class="p">)</span><span class="o">.</span><span class="n">samples</span><span class="p">()</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">ntaps</span><span class="o">//</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">signal</span></div>
+
+
+<span class="c1">#def apply_modulations(signal, fs, nblock, spectrum, delay, ntaps=None):</span>
+    <span class="c1">#&quot;&quot;&quot;Modulate `signal` with amplitude modulations given by `spectrum` and time-delay modulations given by `delay`.</span>
+
+    <span class="c1">#&quot;&quot;&quot;</span>
+    <span class="c1">#return modulate_with_complex_spectra(signal, fs, nblock, spectrum, delay, ntaps=ntaps)</span>
+
+
+<div class="viewcode-block" id="modulate"><a class="viewcode-back" href="../../stream.html#scintillations.stream.modulate">[docs]</a><span class="k">def</span> <span class="nf">modulate</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">nhop</span><span class="p">,</span> <span class="n">correlation_length</span><span class="p">,</span> <span class="n">speed</span><span class="p">,</span> <span class="n">distance</span><span class="p">,</span> <span class="n">soundspeed</span><span class="p">,</span> <span class="n">mean_mu_squared</span><span class="p">,</span> <span class="n">fmin</span><span class="p">,</span> <span class="n">ntaps_corr</span><span class="o">=</span><span class="mi">8192</span><span class="p">,</span>
+             <span class="n">ntaps_spectra</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">include_saturation</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+             <span class="n">include_amplitude</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">include_phase</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;spectra_and_delay&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute and apply scintillations to `signal`.</span>
+
+<span class="sd">    :param signal: Signal to modulate.</span>
+<span class="sd">    :type signal: :class:`Stream`</span>
+<span class="sd">    :param fs: Sample frequency</span>
+<span class="sd">    :param nhop: Compute new impulse response and delay every `nhop` samples.</span>
+<span class="sd">    :param correlation: Correlation length.</span>
+<span class="sd">    :type correlation: Either a single value, or a :class:`Stream` sampled at `fs/nhop`.</span>
+<span class="sd">    :param speed: Transverse speed.</span>
+<span class="sd">    :type correlation: Either a single value, or a :class:`Stream` sampled at `fs/nhop`.</span>
+<span class="sd">    :param distance: Source-receiver distance.</span>
+<span class="sd">    :type distance: Either a single value, or a :class:`Stream` sampled at `fs/nhop`.</span>
+<span class="sd">    :param soundspeed: Speed of sound.</span>
+<span class="sd">    :type soundspeed: Either a single value, or a :class:`Stream` sampled at `fs/nhop`.</span>
+<span class="sd">    :param mean_mu_squared: Variance of the refractive-index field.</span>
+<span class="sd">    :type mean_mu_squared: Either a single value, or a :class:`Stream` sampled at `fs/nhop`.</span>
+<span class="sd">    :param ntaps_corr: Length of the impulse responses for the correlation filter.</span>
+<span class="sd">    :param ntaps_spectra: Length of the impulse responses for the eventual magnitude-filter.</span>
+<span class="sd">    :param window: Window</span>
+<span class="sd">    :param include_saturation: Whether to include log-amplitude saturation.</span>
+<span class="sd">    :param state: State of the PRNG.</span>
+<span class="sd">    :param include_amplitude: Whether to include log-amplitude fluctuations.</span>
+<span class="sd">    :param include_phase: Whether to include phase fluctuations.</span>
+<span class="sd">    :param method: Method to use.</span>
+
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Generate complex spectra or magnitude spectra and delays</span>
+    <span class="c1"># Block rate</span>
+    <span class="n">fb</span> <span class="o">=</span> <span class="n">fs</span> <span class="o">/</span> <span class="n">nhop</span>
+    <span class="n">frequency</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">rfftfreq</span><span class="p">(</span><span class="n">ntaps_spectra</span><span class="p">,</span> <span class="mf">1.</span><span class="o">/</span> <span class="n">fs</span><span class="p">)</span>
+
+    <span class="c1">## Downsample speed, correlation_length, distance, soundspeed, mean_mu_squared</span>
+    <span class="c1">## TODO: lowpass filter?</span>
+    <span class="c1">#if isinstance(speed, streaming.abstractstream.AbstractStream):               speed = speed.samples().take_nth(nhop)</span>
+    <span class="c1">#if isinstance(correlation_length, streaming.abstractstream.AbstractStream):  correlation_length = correlation_length.samples().take_nth(nhop)</span>
+    <span class="c1">#if isinstance(distance, streaming.abstractstream.AbstractStream):            distance = distance.samples().take_nth(nhop)</span>
+    <span class="c1">#if isinstance(soundspeed, streaming.abstractstream.AbstractStream):          soundspeed = soundspeed.samples().take_nth(nhop)</span>
+    <span class="c1">#if isinstance(mean_mu_squared, streaming.abstractstream.AbstractStream):     mean_mu_squared = mean_mu_squared.samples().take_nth(nhop)</span>
+
+    <span class="k">if</span> <span class="n">method</span><span class="o">==</span><span class="s2">&quot;complex_spectra&quot;</span><span class="p">:</span>
+        <span class="n">complex_spectra</span> <span class="o">=</span> <span class="n">generate_fluctuations_complex_spectra</span><span class="p">(</span><span class="n">fb</span><span class="p">,</span> <span class="n">ntaps_corr</span><span class="p">,</span> <span class="n">correlation_length</span><span class="p">,</span> <span class="n">speed</span><span class="p">,</span>
+                                                                <span class="n">frequency</span><span class="p">,</span> <span class="n">soundspeed</span><span class="p">,</span> <span class="n">distance</span><span class="p">,</span> <span class="n">mean_mu_squared</span><span class="p">,</span>
+                                                                <span class="n">fmin</span><span class="p">,</span> <span class="n">include_saturation</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">window</span><span class="p">)</span>
+
+        <span class="n">modulated</span> <span class="o">=</span> <span class="n">modulate_with_complex_spectra</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">nhop</span><span class="p">,</span> <span class="n">complex_spectra</span><span class="p">,</span> <span class="n">ntaps</span><span class="o">=</span><span class="n">ntaps_spectra</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">method</span><span class="o">==</span><span class="s2">&quot;spectra_and_delay&quot;</span><span class="p">:</span>
+
+        <span class="n">spectra</span><span class="p">,</span> <span class="n">delay</span> <span class="o">=</span> <span class="n">generate_fluctuations_spectra_and_delay</span><span class="p">(</span><span class="n">fb</span><span class="p">,</span> <span class="n">ntaps_corr</span><span class="p">,</span> <span class="n">correlation_length</span><span class="p">,</span> <span class="n">speed</span><span class="p">,</span>
+                                                                 <span class="n">frequency</span><span class="p">,</span> <span class="n">soundspeed</span><span class="p">,</span> <span class="n">distance</span><span class="p">,</span> <span class="n">mean_mu_squared</span><span class="p">,</span>
+                                                                 <span class="n">fmin</span><span class="p">,</span> <span class="n">include_saturation</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">window</span><span class="p">)</span>
+        <span class="c1"># Apply modulations</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">include_amplitude</span><span class="p">:</span>
+            <span class="n">spectra</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">include_phase</span><span class="p">:</span>
+            <span class="n">delay</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">modulated</span> <span class="o">=</span> <span class="n">modulate_with_spectra_and_delay</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">fs</span><span class="p">,</span> <span class="n">nhop</span><span class="p">,</span> <span class="n">spectra</span><span class="p">,</span> <span class="n">delay</span><span class="p">,</span> <span class="n">ntaps</span><span class="o">=</span><span class="n">ntaps_spectra</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Incorrect method.&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">modulated</span></div>
+
+
+
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">scintillations 0.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 1970, Frederik Rietdijk.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.6.
+    </div>
+  </body>
+</html>

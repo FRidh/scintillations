@@ -1,0 +1,364 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Sequence &#8212; scintillations 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="scintillations 0.1 documentation" href="index.html" />
+    <link rel="next" title="Stream" href="stream.html" />
+    <link rel="prev" title="Welcome to scintillations’s documentation!" href="index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="stream.html" title="Stream"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to scintillations’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">scintillations 0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <span class="target" id="module-scintillations.sequence"></span><div class="section" id="sequence">
+<h1>Sequence<a class="headerlink" href="#sequence" title="Permalink to this headline">¶</a></h1>
+<p>Generate a sequence of scintillations.</p>
+<p>Note that this implementation takes into account varying correlation time by updating
+the impulse response, and not resampling.</p>
+<dl class="function">
+<dt id="scintillations.sequence.apply_delay">
+<code class="descclassname">scintillations.sequence.</code><code class="descname">apply_delay</code><span class="sig-paren">(</span><em>signal</em>, <em>delay</em>, <em>fs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scintillations/sequence.html#apply_delay"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scintillations.sequence.apply_delay" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply propagation delay fluctuations.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>signal</strong> &#8211; Signal</li>
+<li><strong>delay</strong> &#8211; Propagation delay fluctuations.</li>
+<li><strong>fs</strong> &#8211; Sample frequency</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Frequency-modulated signal.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="scintillations.sequence.apply_fluctuations">
+<code class="descclassname">scintillations.sequence.</code><code class="descname">apply_fluctuations</code><span class="sig-paren">(</span><em>signal</em>, <em>fs</em>, <em>frequency=None</em>, <em>log_amplitude=None</em>, <em>phase=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scintillations/sequence.html#apply_fluctuations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scintillations.sequence.apply_fluctuations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply log-amplitude and/or phase fluctuations.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="scintillations.sequence.apply_log_amplitude">
+<code class="descclassname">scintillations.sequence.</code><code class="descname">apply_log_amplitude</code><span class="sig-paren">(</span><em>signal</em>, <em>log_amplitude</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scintillations/sequence.html#apply_log_amplitude"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scintillations.sequence.apply_log_amplitude" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply log-amplitude fluctuations.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>signal</strong> &#8211; Pressure signal.</li>
+<li><strong>log_amplitude</strong> &#8211; Log-amplitude fluctuations.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="math">
+\[p_m = p \exp{\chi}\]</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="scintillations.sequence.apply_phase">
+<code class="descclassname">scintillations.sequence.</code><code class="descname">apply_phase</code><span class="sig-paren">(</span><em>signal</em>, <em>phase</em>, <em>frequency</em>, <em>fs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scintillations/sequence.html#apply_phase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scintillations.sequence.apply_phase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply phase fluctuations.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>signal</strong> &#8211; Pressure signal.</li>
+<li><strong>phase</strong> &#8211; Phase fluctuations.</li>
+<li><strong>frequency</strong> &#8211; Frequency of tone.</li>
+<li><strong>fs</strong> &#8211; Sample frequency.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Phase fluctuations are applied through a resampling.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="scintillations.sequence.covariance_gaussian">
+<code class="descclassname">scintillations.sequence.</code><code class="descname">covariance_gaussian</code><span class="sig-paren">(</span><em>spatial_separation</em>, <em>distance</em>, <em>wavenumber</em>, <em>scale</em>, <em>mean_mu_squared</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scintillations/sequence.html#covariance_gaussian"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scintillations.sequence.covariance_gaussian" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the covariance of a Gaussian turbulence spectrum and spherical waves.</p>
+<p>See Daigle, 1987: equation 2 and 3.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>spatial_separation</strong> &#8211; Spatial separation.</li>
+<li><strong>distance</strong> &#8211; Distance.</li>
+<li><strong>wavenumber</strong> &#8211; Wavenumber.</li>
+<li><strong>mean_mu_squared</strong> &#8211; Mean mu squared.</li>
+<li><strong>scale</strong> &#8211; Outer length scale.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Covariance</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="math">
+\[B{\chi} (\rho) = B{S}(\rho) = \frac{\sqrt{\pi}}{2} \langle \mu^2 \rangle k^2 r L \frac{\Phi(\rho/L) }{\rho / L}\]</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="scintillations.sequence.fluctuations_with_variance">
+<code class="descclassname">scintillations.sequence.</code><code class="descname">fluctuations_with_variance</code><span class="sig-paren">(</span><em>fluctuations</em>, <em>wavenumber</em>, <em>distance</em>, <em>correlation_length</em>, <em>mean_mu_squared</em>, <em>include_saturation=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scintillations/sequence.html#fluctuations_with_variance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scintillations.sequence.fluctuations_with_variance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate fluctuations with correct variance.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="scintillations.sequence.generate_fluctuations_logamp_and_phase">
+<code class="descclassname">scintillations.sequence.</code><code class="descname">generate_fluctuations_logamp_and_phase</code><span class="sig-paren">(</span><em>nsamples</em>, <em>fs</em>, <em>ntaps</em>, <em>correlation_length</em>, <em>speed</em>, <em>frequency</em>, <em>soundspeed</em>, <em>distance</em>, <em>mean_mu_squared</em>, <em>include_saturation=True</em>, <em>state=None</em>, <em>window=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scintillations/sequence.html#generate_fluctuations_logamp_and_phase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scintillations.sequence.generate_fluctuations_logamp_and_phase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate logamp and phase fluctuations.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Logamp <span class="math">\(\chi(t)\)</span> and phase <span class="math">\(S(t)\)</span> fluctuations.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="scintillations.sequence.generate_fluctuations_spectra_and_delay">
+<code class="descclassname">scintillations.sequence.</code><code class="descname">generate_fluctuations_spectra_and_delay</code><span class="sig-paren">(</span><em>nsamples</em>, <em>fs</em>, <em>ntaps</em>, <em>correlation_length</em>, <em>speed</em>, <em>frequency</em>, <em>soundspeed</em>, <em>distance</em>, <em>mean_mu_squared</em>, <em>include_saturation=True</em>, <em>state=None</em>, <em>window=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scintillations/sequence.html#generate_fluctuations_spectra_and_delay"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scintillations.sequence.generate_fluctuations_spectra_and_delay" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate fluctuations represented by a time-variant magnitude-only spectrum and a variable delay.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Magnitude-only spectra as function of time, and delay as function of time</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><code class="xref py py-func docutils literal"><span class="pre">generate_complex_fluctuations()</span></code></p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="scintillations.sequence.generate_gaussian_fluctuations_standard">
+<code class="descclassname">scintillations.sequence.</code><code class="descname">generate_gaussian_fluctuations_standard</code><span class="sig-paren">(</span><em>nsamples</em>, <em>ntaps</em>, <em>fs</em>, <em>correlation_time</em>, <em>state=None</em>, <em>window=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scintillations/sequence.html#generate_gaussian_fluctuations_standard"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scintillations.sequence.generate_gaussian_fluctuations_standard" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate Gaussian fluctuations with variance 1.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>nsamples</strong> &#8211; Length of the sequence in samples.</li>
+<li><strong>ntaps</strong> &#8211; Length of the filter used to shape the PSD of the sequence.</li>
+<li><strong>fs</strong> &#8211; Sample frequency.</li>
+<li><strong>correlation_time</strong> &#8211; Correlation time. Single value or array with a value for each time instance.</li>
+<li><strong>state</strong> &#8211; State of random number generator.</li>
+<li><strong>window</strong> &#8211; Window used in filter design.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Fluctuations.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>This function generates fluctuations that are Gaussian distributed and have a variance of 1.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="scintillations.sequence.logamp_structure">
+<code class="descclassname">scintillations.sequence.</code><code class="descname">logamp_structure</code><span class="sig-paren">(</span><em>logamp_a</em>, <em>logamp_b</em>, <em>axis=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scintillations/sequence.html#logamp_structure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scintillations.sequence.logamp_structure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Structure function for log-amplitude fluctuations.</p>
+<p>See Daigle, equation 17.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="scintillations.sequence.logamp_variance">
+<code class="descclassname">scintillations.sequence.</code><code class="descname">logamp_variance</code><span class="sig-paren">(</span><em>logamp</em>, <em>axis=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scintillations/sequence.html#logamp_variance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scintillations.sequence.logamp_variance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Logamp variance.</p>
+<p>See Daigle,  equation 19.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="scintillations.sequence.modulate_broadband">
+<code class="descclassname">scintillations.sequence.</code><code class="descname">modulate_broadband</code><span class="sig-paren">(</span><em>signal</em>, <em>fs</em>, <em>nblock</em>, <em>correlation_length</em>, <em>speed</em>, <em>distance</em>, <em>soundspeed</em>, <em>mean_mu_squared</em>, <em>ntaps_corr=8192</em>, <em>ntaps_spectra=128</em>, <em>window=None</em>, <em>include_saturation=False</em>, <em>state=None</em>, <em>include_amplitude=True</em>, <em>include_phase=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scintillations/sequence.html#modulate_broadband"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scintillations.sequence.modulate_broadband" title="Permalink to this definition">¶</a></dt>
+<dd><p>Modulate tone.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="scintillations.sequence.modulate_tone">
+<code class="descclassname">scintillations.sequence.</code><code class="descname">modulate_tone</code><span class="sig-paren">(</span><em>signal</em>, <em>fs</em>, <em>frequency</em>, <em>fs_low</em>, <em>correlation_length</em>, <em>speed</em>, <em>distance</em>, <em>soundspeed</em>, <em>mean_mu_squared</em>, <em>ntaps_corr=8192</em>, <em>window=None</em>, <em>include_saturation=False</em>, <em>state=None</em>, <em>include_amplitude=True</em>, <em>include_phase=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scintillations/sequence.html#modulate_tone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scintillations.sequence.modulate_tone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Modulate tone.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>signal</strong> &#8211; Signal to modulate.</li>
+<li><strong>fs</strong> &#8211; Sample frequency of signal.</li>
+<li><strong>fs_low</strong> &#8211; Sample frequency at which to generate the scintillations.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Time-dependent values like speed and correlation length are given per block.</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="scintillations.sequence.phase_structure">
+<code class="descclassname">scintillations.sequence.</code><code class="descname">phase_structure</code><span class="sig-paren">(</span><em>phase_a</em>, <em>phase_b</em>, <em>axis=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scintillations/sequence.html#phase_structure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scintillations.sequence.phase_structure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Structure function for phase fluctuations.</p>
+<p>See Daigle, equation 18.</p>
+<p>The last term accounts for the fact that the mean phase difference of the signals may be nonzero.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="scintillations.sequence.phase_variance">
+<code class="descclassname">scintillations.sequence.</code><code class="descname">phase_variance</code><span class="sig-paren">(</span><em>phase</em>, <em>axis=-1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scintillations/sequence.html#phase_variance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scintillations.sequence.phase_variance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Phase variance.</p>
+<p>See Daigle, equation 20.</p>
+<p>The last term accounts for the fact that the mean phase difference of the signals may be nonzero.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="scintillations.sequence.variance_gaussian">
+<code class="descclassname">scintillations.sequence.</code><code class="descname">variance_gaussian</code><span class="sig-paren">(</span><em>distance</em>, <em>wavenumber</em>, <em>scale</em>, <em>mean_mu_squared</em>, <em>include_saturation=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scintillations/sequence.html#variance_gaussian"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scintillations.sequence.variance_gaussian" title="Permalink to this definition">¶</a></dt>
+<dd><p>Variance of Gaussian fluctuations.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>distance</strong> &#8211; Distance.</li>
+<li><strong>wavenumber</strong> &#8211; Wavenumber.</li>
+<li><strong>scale</strong> &#8211; Correlation length</li>
+<li><strong>mean_mu_squared</strong> &#8211; Mean mu squared.</li>
+<li><strong>include_saturation</strong> &#8211; Whether to include log-amplitude saturation. In this case the variance is multiplied with the saturation factor, <code class="xref py py-func docutils literal"><span class="pre">saturation_factor()</span></code>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Variance</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="math">
+\[\langle \chi^2 \rangle = \langle S^2 \rangle = \frac{\sqrt{\pi}}{2} \langle \mu^2 \rangle k^2 r L\]</div>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to scintillations&#8217;s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="stream.html"
+                        title="next chapter">Stream</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/sequence.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="stream.html" title="Stream"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to scintillations’s documentation!"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">scintillations 0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 1970, Frederik Rietdijk.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.6.
+    </div>
+  </body>
+</html>

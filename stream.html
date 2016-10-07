@@ -1,0 +1,301 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Stream &#8212; scintillations 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="scintillations 0.1 documentation" href="index.html" />
+    <link rel="prev" title="Sequence" href="sequence.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="sequence.html" title="Sequence"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">scintillations 0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <span class="target" id="module-scintillations.stream"></span><div class="section" id="stream">
+<h1>Stream<a class="headerlink" href="#stream" title="Permalink to this headline">¶</a></h1>
+<p>Generate a stream of scintillations. Functions in this module are supposed to work with <code class="xref py py-mod docutils literal"><span class="pre">streaming.stream</span></code>.</p>
+<p>Varying correlation time is taken into account by resampling the generated fluctuations.</p>
+<dl class="function">
+<dt id="scintillations.stream.fluctuations_with_variance">
+<code class="descclassname">scintillations.stream.</code><code class="descname">fluctuations_with_variance</code><span class="sig-paren">(</span><em>fluctuations</em>, <em>wavenumber</em>, <em>distance</em>, <em>correlation_length</em>, <em>mean_mu_squared</em>, <em>include_saturation=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scintillations/stream.html#fluctuations_with_variance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scintillations.stream.fluctuations_with_variance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate fluctuations with correct variance.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="scintillations.stream.generate_fluctuations">
+<code class="descclassname">scintillations.stream.</code><code class="descname">generate_fluctuations</code><span class="sig-paren">(</span><em>fs_desired</em>, <em>fs</em>, <em>ntaps</em>, <em>speed</em>, <em>correlation_length</em>, <em>state</em>, <em>window=None</em>, <em>method='resample_fluctuations'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scintillations/stream.html#generate_fluctuations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scintillations.stream.generate_fluctuations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate fluctuations.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="scintillations.stream.generate_fluctuations_complex_spectrum">
+<code class="descclassname">scintillations.stream.</code><code class="descname">generate_fluctuations_complex_spectrum</code><span class="sig-paren">(</span><em>fluctuations</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scintillations/stream.html#generate_fluctuations_complex_spectrum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scintillations.stream.generate_fluctuations_complex_spectrum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate fluctuations.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Frequencies, complex spectra</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="scintillations.stream.generate_fluctuations_resample_filter">
+<code class="descclassname">scintillations.stream.</code><code class="descname">generate_fluctuations_resample_filter</code><span class="sig-paren">(</span><em>fs_desired</em>, <em>fs</em>, <em>ntaps</em>, <em>speed</em>, <em>correlation_length</em>, <em>state</em>, <em>window=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scintillations/stream.html#generate_fluctuations_resample_filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scintillations.stream.generate_fluctuations_resample_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate fluctuations.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This function applies change of relative speed by updating the impulse response of the filter by resampling the initial frequency response.</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="scintillations.stream.generate_fluctuations_resample_fluctuations">
+<code class="descclassname">scintillations.stream.</code><code class="descname">generate_fluctuations_resample_fluctuations</code><span class="sig-paren">(</span><em>ntaps</em>, <em>fs_desired</em>, <em>correlation_time</em>, <em>state</em>, <em>fs_base=50.0</em>, <em>window=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scintillations/stream.html#generate_fluctuations_resample_fluctuations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scintillations.stream.generate_fluctuations_resample_fluctuations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate fluctuations.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>fs_desired</strong> &#8211; Sample frequency of the input and the output.</li>
+<li><strong>fs</strong> &#8211; Sample frequency at which to compute the initial fluctuations.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Fluctuations.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This function applies change of relative speed by resampling the fluctuations at a different pace.</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="scintillations.stream.generate_fluctuations_spectra_and_delay">
+<code class="descclassname">scintillations.stream.</code><code class="descname">generate_fluctuations_spectra_and_delay</code><span class="sig-paren">(</span><em>fs</em>, <em>ntaps</em>, <em>correlation_length</em>, <em>speed</em>, <em>frequency</em>, <em>soundspeed</em>, <em>distance</em>, <em>mean_mu_squared</em>, <em>fmin</em>, <em>include_saturation=True</em>, <em>state=None</em>, <em>window=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scintillations/stream.html#generate_fluctuations_spectra_and_delay"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scintillations.stream.generate_fluctuations_spectra_and_delay" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate fluctuations.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>fs</strong> &#8211; Sample frequency.</li>
+<li><strong>ntaps</strong> &#8211; Taps of impulse response.</li>
+<li><strong>correlation_length</strong> &#8211; Correlation length.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Frequencies, magnitude spectra and delays.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="scintillations.stream.generate_fluctuations_update_filter">
+<code class="descclassname">scintillations.stream.</code><code class="descname">generate_fluctuations_update_filter</code><span class="sig-paren">(</span><em>ntaps</em>, <em>fs</em>, <em>correlation_time</em>, <em>state</em>, <em>window=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scintillations/stream.html#generate_fluctuations_update_filter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scintillations.stream.generate_fluctuations_update_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate fluctuations.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This function applies change of relative speed by updating the impulse response of the filter by recomputing.</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="scintillations.stream.modulate">
+<code class="descclassname">scintillations.stream.</code><code class="descname">modulate</code><span class="sig-paren">(</span><em>signal</em>, <em>fs</em>, <em>nhop</em>, <em>correlation_length</em>, <em>speed</em>, <em>distance</em>, <em>soundspeed</em>, <em>mean_mu_squared</em>, <em>fmin</em>, <em>ntaps_corr=8192</em>, <em>ntaps_spectra=128</em>, <em>window=None</em>, <em>include_saturation=False</em>, <em>state=None</em>, <em>include_amplitude=True</em>, <em>include_phase=True</em>, <em>method='spectra_and_delay'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scintillations/stream.html#modulate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scintillations.stream.modulate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute and apply scintillations to <cite>signal</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>signal</strong> (<code class="xref py py-class docutils literal"><span class="pre">Stream</span></code>) &#8211; Signal to modulate.</li>
+<li><strong>fs</strong> &#8211; Sample frequency</li>
+<li><strong>nhop</strong> &#8211; Compute new impulse response and delay every <cite>nhop</cite> samples.</li>
+<li><strong>correlation</strong> (Either a single value, or a <code class="xref py py-class docutils literal"><span class="pre">Stream</span></code> sampled at <cite>fs/nhop</cite>.) &#8211; Correlation length.</li>
+<li><strong>speed</strong> &#8211; Transverse speed.</li>
+<li><strong>distance</strong> (Either a single value, or a <code class="xref py py-class docutils literal"><span class="pre">Stream</span></code> sampled at <cite>fs/nhop</cite>.) &#8211; Source-receiver distance.</li>
+<li><strong>soundspeed</strong> (Either a single value, or a <code class="xref py py-class docutils literal"><span class="pre">Stream</span></code> sampled at <cite>fs/nhop</cite>.) &#8211; Speed of sound.</li>
+<li><strong>mean_mu_squared</strong> (Either a single value, or a <code class="xref py py-class docutils literal"><span class="pre">Stream</span></code> sampled at <cite>fs/nhop</cite>.) &#8211; Variance of the refractive-index field.</li>
+<li><strong>ntaps_corr</strong> &#8211; Length of the impulse responses for the correlation filter.</li>
+<li><strong>ntaps_spectra</strong> &#8211; Length of the impulse responses for the eventual magnitude-filter.</li>
+<li><strong>window</strong> &#8211; Window</li>
+<li><strong>include_saturation</strong> &#8211; Whether to include log-amplitude saturation.</li>
+<li><strong>state</strong> &#8211; State of the PRNG.</li>
+<li><strong>include_amplitude</strong> &#8211; Whether to include log-amplitude fluctuations.</li>
+<li><strong>include_phase</strong> &#8211; Whether to include phase fluctuations.</li>
+<li><strong>method</strong> &#8211; Method to use.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="scintillations.stream.modulate_with_complex_spectra">
+<code class="descclassname">scintillations.stream.</code><code class="descname">modulate_with_complex_spectra</code><span class="sig-paren">(</span><em>signal</em>, <em>fs</em>, <em>nhop</em>, <em>complex_spectra</em>, <em>ntaps</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scintillations/stream.html#modulate_with_complex_spectra"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scintillations.stream.modulate_with_complex_spectra" title="Permalink to this definition">¶</a></dt>
+<dd><p>Modulate signal with amplitude and phase fluctuations.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The complex spectra includes amplitude and phase fluctuations.</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="scintillations.stream.modulate_with_spectra_and_delay">
+<code class="descclassname">scintillations.stream.</code><code class="descname">modulate_with_spectra_and_delay</code><span class="sig-paren">(</span><em>signal</em>, <em>fs</em>, <em>nhop</em>, <em>spectra</em>, <em>delay</em>, <em>ntaps=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scintillations/stream.html#modulate_with_spectra_and_delay"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scintillations.stream.modulate_with_spectra_and_delay" title="Permalink to this definition">¶</a></dt>
+<dd><p>Modulate signal with amplitude and phase fluctuations.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>signal</strong> &#8211; Carrier signal.</li>
+<li><strong>fs</strong> &#8211; Sample frequency of signal.</li>
+<li><strong>nhop</strong> &#8211; Compute impulse response to describe fluctuations every <cite>nhop</cite> samples.</li>
+<li><strong>spectra</strong> &#8211; Spectrum for each block. Single side magnitude only.</li>
+<li><strong>delay</strong> &#8211; Delay for each block.</li>
+<li><strong>ntaps</strong> &#8211; Amount of filter taps to use for IR of <cite>spectra</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Modulated signal.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">streaming.stream.Stream()</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The spectra describe amplitude fluctuations and the delay is the phase or propagation delay fluctuations.</p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="scintillations.stream.variance_gaussian">
+<code class="descclassname">scintillations.stream.</code><code class="descname">variance_gaussian</code><span class="sig-paren">(</span><em>distance</em>, <em>wavenumber</em>, <em>scale</em>, <em>mean_mu_squared</em>, <em>include_saturation=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scintillations/stream.html#variance_gaussian"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#scintillations.stream.variance_gaussian" title="Permalink to this definition">¶</a></dt>
+<dd><p>Variance of Gaussian fluctuations.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>distance</strong> &#8211; Distance.</li>
+<li><strong>wavenumber</strong> &#8211; Wavenumber.</li>
+<li><strong>scale</strong> &#8211; Correlation length</li>
+<li><strong>mean_mu_squared</strong> &#8211; Mean mu squared.</li>
+<li><strong>include_saturation</strong> &#8211; Whether to include log-amplitude saturation. In this case the variance is multiplied with the saturation factor, <code class="xref py py-func docutils literal"><span class="pre">saturation_factor()</span></code>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Variance</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="math">
+\[\langle \chi^2 \rangle = \langle S^2 \rangle = \frac{\sqrt{\pi}}{2} \langle \mu^2 \rangle k^2 r L\]</div>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="sequence.html"
+                        title="previous chapter">Sequence</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/stream.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="sequence.html" title="Sequence"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">scintillations 0.1 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 1970, Frederik Rietdijk.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.6.
+    </div>
+  </body>
+</html>
