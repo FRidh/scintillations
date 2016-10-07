@@ -25,7 +25,7 @@ CLASSIFIERS = [
 
 setup(
     name='scintillations',
-    version='0.1',
+    version='0.1.0',
     description="Generate sequences of scintillations",
     author='Frederik Rietdijk',
     author_email='freddyrietdijk@fridh.nl',
