@@ -4,6 +4,9 @@ Sequence
 
 Generate a sequence of scintillations.
 
+Note that this implementation takes into account varying correlation time by updating
+the impulse response, and not resampling.
+
 """
 import numpy as np
 from scipy.signal import resample, fftconvolve

@@ -4,6 +4,8 @@ Stream
 
 Generate a stream of scintillations. Functions in this module are supposed to work with :mod:`streaming.stream`.
 
+Varying correlation time is taken into account by resampling the generated fluctuations.
+
 """
 import streaming
 import itertools
