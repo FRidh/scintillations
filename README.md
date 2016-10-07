@@ -7,9 +7,23 @@ The method was developed to generate more realistic aircraft auralizations.
 
 ## Installation
 
-Clone the repository, and then
+The latest release can be found on PyPI and installed with `pip install streaming`.
+Otherwise, you can clone this repository and install with `pip install` or `pip install -e` when you want an editable install.
 
-`pip install .`
+## Tests
+
+The test suite can be run with
+
+`python setup.py test`
+
+or
+
+`py.test`
+
+
+## Documentation
+
+The latest version of the documentation can be found at http://fridh.github.io/scintillations.
 
 ## License
 
