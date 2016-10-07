@@ -18,12 +18,14 @@ class PyTest(TestCommand):
 
 CLASSIFIERS = [
     'License :: OSI Approved :: BSD License',
+    'Programming Language :: Python :: 3 :: Only',
+    'Programming Language :: Python :: 3.5',
     'Topic :: Scientific/Engineering',
     ]
 
 setup(
     name='scintillations',
-    version='0.0',
+    version='0.1',
     description="Generate sequences of scintillations",
     author='Frederik Rietdijk',
     author_email='freddyrietdijk@fridh.nl',
