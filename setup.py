@@ -38,6 +38,6 @@ setup(
         'streaming',
         ],
     classifiers=CLASSIFIERS,
-    tests_require = [ 'pytest' ],
+    tests_require = [ 'pytest', 'acoustics' ],
     cmdclass = {'test': PyTest},
     )
