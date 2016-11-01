@@ -20,7 +20,6 @@ def variance_gaussian(distance, wavenumber, scale, mean_mu_squared, include_satu
     :param wavenumber: Wavenumber.
     :param scale: Correlation length
     :param mean_mu_squared: Mean mu squared.
-
     :param include_saturation: Whether to include log-amplitude saturation. In this case the variance is multiplied with the saturation factor, :func:`saturation_factor`.
     :returns: Variance
 
@@ -76,11 +75,14 @@ def fluctuations_with_variance(fluctuations, wavenumber, distance, correlation_l
 
 
 def generate_fluctuations_resample_fluctuations(ntaps, fs_desired, correlation_time, state, fs_base=50., window=None):
-    """Generate fluctuations.
+    """Generate a stream of fluctuations.
 
+    :param ntaps: Amount of taps for the impulse response.
     :param fs_desired: Sample frequency of the input and the output.
-    :param fs: Sample frequency at which to compute the initial fluctuations.
-
+    :param correlation_time: Correlation time of the fluctuations.
+    :param state: Initial state of the random number generator.
+    :param fs_base: Sample frequency at which to compute the initial fluctuations.
+    :param window: Window
     :returns: Fluctuations.
 
     .. note:: This function applies change of relative speed by resampling the fluctuations at a different pace.
@@ -115,8 +117,15 @@ def generate_fluctuations_resample_filter(fs_desired, fs, ntaps, speed, correlat
     return NotImplemented
 
 
-def generate_fluctuations_update_filter(ntaps, fs, correlation_time, state, window=None):
-    """Generate fluctuations.
+def generate_fluctuations_update_filter(ntaps, fs_desired, correlation_time, state, window=None):
+    """Generate a stream of fluctuations.
+
+    :param ntaps: Amount of taps for the impulse response.
+    :param fs_desired: Sample frequency of the input and the output.
+    :param correlation_time: Correlation time of the fluctuations.
+    :param state: Initial state of the random number generator.
+    :param window: Window
+    :returns: Fluctuations.
 
     .. note:: This function applies change of relative speed by updating the impulse response of the filter by recomputing.
     """
@@ -205,6 +214,8 @@ def generate_fluctuations(fs_desired, fs, ntaps, speed, correlation_length, stat
 
 
 def _stream_or_constant(x):
+    """Return a stream of samples given a stream or a constant.
+    """
     if isinstance(x, streaming.abstractstream.AbstractStream):
         return x.samples()
     else:
@@ -213,12 +224,20 @@ def _stream_or_constant(x):
 
 def generate_fluctuations_spectra_and_delay(fs, ntaps, correlation_length, speed, frequency, soundspeed,
                                             distance, mean_mu_squared, fmin, include_saturation=True, state=None, window=None):
-    """Generate fluctuations.
+    """Generate fluctuations. This function returns a stream with amplitude spectra, and a stream with time delays.
 
     :param fs: Sample frequency.
     :param ntaps: Taps of impulse response.
     :param correlation_length: Correlation length.
-
+    :param speed: Magnitude of the transverse velocity.
+    :param frequency: Frequency of the signal that is modulated.
+    :param soundspeed: Speed of sound.
+    :param distance: Distance between source and receiver.
+    :param mean_mu_squared: Mean of the dynamic refractive-index squared.
+    :param fmin: Lowest sample frequency to generate original sequence at.
+    :param include_saturation: Whether to include logamp saturation.
+    :param state: Initial state of the random number generator.
+    :param window: Window.
     :returns: Frequencies, magnitude spectra and delays.
     """
     correlation_length = _stream_or_constant(correlation_length)
