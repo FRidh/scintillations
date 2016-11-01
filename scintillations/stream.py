@@ -109,12 +109,12 @@ def generate_fluctuations_resample_fluctuations(ntaps, fs_desired, correlation_t
     return fluctuations
 
 
-def generate_fluctuations_resample_filter(fs_desired, fs, ntaps, speed, correlation_length, state, window=None):
-    """Generate fluctuations.
+#def generate_fluctuations_resample_filter(fs_desired, fs_base, ntaps, speed, correlation_length, state, window=None):
+    #"""Generate fluctuations.
 
-    .. note:: This function applies change of relative speed by updating the impulse response of the filter by resampling the initial frequency response.
-    """
-    return NotImplemented
+    #.. note:: This function applies change of relative speed by updating the impulse response of the filter by resampling the initial frequency response.
+    #"""
+    #return NotImplemented
 
 
 def generate_fluctuations_update_filter(ntaps, fs_desired, correlation_time, state, window=None):
@@ -145,15 +145,15 @@ def generate_fluctuations_update_filter(ntaps, fs_desired, correlation_time, sta
     return fluctuations
 
 
-def generate_fluctuations(fs_desired, fs, ntaps, speed, correlation_length, state, window=None, method="resample_fluctuations"):
-    """Generate fluctuations.
-    """
-    if method == 'resample_fluctuations':
-        return generate_fluctuations_resample_fluctuations(fs_desired, fs, ntaps, speed, correlation_length, state, window=None)
-    elif method == 'update_filter':
-        return generate_fluctuations_update_filter(fs_desired, fs, ntaps, speed, correlation_length, state, window=None)
-    elif method == 'resample_filter':
-        return generate_fluctuations_resample_filter(fs_desired, fs, ntaps, speed, correlation_length, state, window=None)
+#def generate_fluctuations(fs_desired, fs, ntaps, speed, correlation_length, state, window=None, method="resample_fluctuations"):
+    #"""Generate a stream of fluctuations.
+    #"""
+    #if method == 'resample_fluctuations':
+        #return generate_fluctuations_resample_fluctuations(fs_desired, fs, ntaps, speed, correlation_length, state, window=None)
+    #elif method == 'update_filter':
+        #return generate_fluctuations_update_filter(fs_desired, fs, ntaps, speed, correlation_length, state, window=None)
+    #elif method == 'resample_filter':
+        #return generate_fluctuations_resample_filter(fs_desired, fs, ntaps, speed, correlation_length, state, window=None)
 
 
 
@@ -263,27 +263,27 @@ def generate_fluctuations_spectra_and_delay(fs, ntaps, correlation_length, speed
     return spectra, delay
 
 
-def generate_fluctuations_complex_spectrum(fluctuations):
-    """Generate fluctuations.
+#def generate_fluctuations_complex_spectrum(fluctuations):
+    #"""Generate fluctuations.
 
-    :returns: Frequencies, complex spectra
-    """
-    correlation_length = _stream_or_constant(correlation_length)
-    speed = _stream_or_constant(speed)
-    soundspeed = _stream_or_constant(soundspeed)
-    distance = _stream_or_constant(distance)
-    mean_mu_squared = _stream_or_constant(mean_mu_squared)
+    #:returns: Frequencies, complex spectra
+    #"""
+    #correlation_length = _stream_or_constant(correlation_length)
+    #speed = _stream_or_constant(speed)
+    #soundspeed = _stream_or_constant(soundspeed)
+    #distance = _stream_or_constant(distance)
+    #mean_mu_squared = _stream_or_constant(mean_mu_squared)
 
-    correlation_time = correlation_length.copy() / speed
+    #correlation_time = correlation_length.copy() / speed
 
-    fluctuations = generate_fluctuations_resample_fluctuations(ntaps, fs, correlation_time, state, window=window, fs_base=fmin).samples()
+    #fluctuations = generate_fluctuations_resample_fluctuations(ntaps, fs, correlation_time, state, window=window, fs_base=fmin).samples()
 
-    wavenumber = 2.*np.pi*frequency/soundspeed
-    logamp = fluctuations_with_variance(fluctuations.copy(), wavenumber.copy(), distance.copy(), correlation_length.copy(), mean_mu_squared.copy(), include_saturation)
-    phase =  fluctuations_with_variance(fluctuations, wavenumber, distance, correlation_length, mean_mu_squared, False)
+    #wavenumber = 2.*np.pi*frequency/soundspeed
+    #logamp = fluctuations_with_variance(fluctuations.copy(), wavenumber.copy(), distance.copy(), correlation_length.copy(), mean_mu_squared.copy(), include_saturation)
+    #phase =  fluctuations_with_variance(fluctuations, wavenumber, distance, correlation_length, mean_mu_squared, False)
 
-    complex_spectra = complex_fluctuations(logamp, phase)
-    return complex_spectra
+    #complex_spectra = complex_fluctuations(logamp, phase)
+    #return complex_spectra
 
 
 def modulate_with_spectra_and_delay(signal, fs, nhop, spectra, delay, ntaps=None):
