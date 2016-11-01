@@ -89,7 +89,7 @@ def generate_fluctuations_resample_fluctuations(ntaps, fs_desired, correlation_t
 
     """
     correlation = correlation_spherical_wave(tau(ntaps, fs_base), fs_base)
-    ir = impulse_response_fluctuations(correlation, ntaps)
+    ir = impulse_response_fluctuations(correlation, ntaps, window)
 
     # We now generate fluctuations without taking into account the actual correlation length, speed or sample frequency.
     # Ideal block size? I don't know. Depends on the above parameters!
